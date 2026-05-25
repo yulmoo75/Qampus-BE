@@ -2,7 +2,7 @@ name: Deploy (systemd-lite)
 
 on:
   push:
-    branches: [main] # main 브랜치에 push될 때 배포 진행
+    branches: [main]
 
 jobs:
   deploy:
@@ -26,7 +26,7 @@ jobs:
 
             # 2) 장고 앱 폴더에서 migrate
             cd ${{ secrets.APP_DIR }}
-            if [ -d "myvenv" ]; then       # 여기선 자신이 쓰는 가상환경 이름을 써주세요
+            if [ -d "myvenv" ]; then
               source myvenv/bin/activate
               pip install --upgrade pip
               if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
