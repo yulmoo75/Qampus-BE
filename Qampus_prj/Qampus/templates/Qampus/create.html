@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>질문 올리기</h2>
+    <form method="POST" action="{% url 'Qampus:create' %}">
+        {% csrf_token %}
+        <input type="submit" value="완료">
+        제목 - <input type="text" name="title" /><br /><br />
+        내용 - <textarea name="content"></textarea><br><br>
+        카테고리 - <select name="category" multiple>
+        {% for category in categories %}
+        <option value="{{ category.id }}">{{ category.name }}</option>
+        {% endfor %}
+        </select><br><br>
+    </form>
+</body>
+</html>

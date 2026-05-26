@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% load humanize %}
+    <h2>질의응답</h2><hr>
+    전체 수업 학교프로그램 행정/절차<br>
+
+    {% for post in posts %}
+    <h2><a href="{% url 'blog:detail' post.id %}">{{ post.title }}</a></h2>
+    <p>{{ post.content }}</p>
+    <p>{{ post.created_at|naturaltime }}</p><hr>
+    {% empty %} 작성된 글이 없습니다. <br>{% endfor %}
+
+    <a href="{% url 'Qampus:create' %}">질문 올리기</a>
+    
+</body>
+</html>
