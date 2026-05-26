@@ -14,7 +14,9 @@
     <h2><a href="{% url 'blog:detail' post.id %}">{{ post.title }}</a></h2>
     <p>{{ post.content }}</p>
     <p>{{ post.created_at|naturaltime }}</p><hr>
-    {% empty %} 작성된 글이 없습니다. <br>{% endfor %}
+    {% empty %} 
+        작성된 글이 없습니다. <br>
+    {% endfor %}
 
     <a href="{% url 'Qampus:create' %}">질문 올리기</a>
     
