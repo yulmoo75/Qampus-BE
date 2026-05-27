@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Category, Post
+from .models import *
 from django.shortcuts import get_object_or_404
 
 def main(request, slug=None):
@@ -61,3 +61,44 @@ def category(request, slug):
     posts = Post.objects.filter(category=category).order_by('-created_at')
 
     return render(request, 'Qampus/category.html', {'category':category, 'posts':posts})
+
+
+
+def create_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    if request.method == "POST":
+        content = request.POST.get("content")
+
+        if content:
+            Comment.objects.create(
+                post=post,
+                content=content
+            )
+
+    return redirect("Qampus:detail", post_id)
+
+
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    post_id = comment.post.id
+
+    comment.delete()
+
+    return redirect("Qampus:detail", post_id)
+
+
+def update_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    post_id = comment.post.id
+
+    if request.method == "POST":
+        content = request.POST.get("content")
+
+        if content:
+            comment.content = content
+            comment.save()
+
+    return redirect("Qampus:detail", post_id)
+
+
