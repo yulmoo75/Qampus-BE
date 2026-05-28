@@ -8,15 +8,34 @@
 <body>
     {% load humanize %}
     <h2>질의응답</h2><hr>
-    전체 수업 학교프로그램 행정/절차 <br>
+    <form action="{% url 'Qampus:main' %}" method="POST">
+        {% csrf_token %}
+        
+        <button type="submit" name="category_slug" value="" class="link-btn">전체</button>
+        
+        <button type="submit" name="category_slug" value="class" class="link-btn">수업</button>
+        <button type="submit" name="category_slug" value="program" class="link-btn">학교 프로그램</button>
+        <button type="submit" name="category_slug" value="procedure" class="link-btn">행정/절차</button>
+        
+    </form><hr>
 
+    <select name="sort" onchange="this.form.submit()">
+        <option value="latest" {% if selected_sort == 'latest' %}selected{% endif %}>최신순</option>
+        <option value="popular" {% if selected_sort == 'popular' %}selected{% endif %}>추천순</option>
+    </select>
+
+    <input type="hidden" name="category_slug" value="{{ selected_slug }}">
+    
     {% for post in posts %}
-    <h2><a href="{% url 'blog:detail' post.id %}">{{ post.title }}</a></h2>
-    <p>{{ post.content }}</p>
-    <p>{{ post.created_at|naturaltime }}</p><hr>
-    {% empty %} 
-        작성된 글이 없습니다. <br>
-    {% endfor %} 
+        <p><a href="{% url 'Qampus:detail' post.id %}">{{ post.title }}</a></p>
+        <p>{{ post.content }}</p>
+        <p>{{ post.created_at|naturaltime }}</p><hr>
+    {% empty %}
+        <p>아직 작성된 질문이 없어요</p>
+        #수업 카테고리에서는 수업, 학교 프로그램은 학교 프로그램으로 나오는건지? 그러면 전체는??
+        <p>수업에 대해 궁금한 건 무엇이든 질문하세요!</p>
+    {% endfor %}
+
 
     <a href="{% url 'Qampus:create' %}">질문 올리기</a>
     

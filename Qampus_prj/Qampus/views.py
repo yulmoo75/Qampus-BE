@@ -2,33 +2,32 @@ from django.shortcuts import render, redirect
 from .models import *
 from django.shortcuts import get_object_or_404
 
-def main(request, slug=None):
-    categories = Category.objects.all()
+def main(request):
+    category_slug = request.POST.get('category_slug', '')
+    sort = request.POST.get('sort', 'latest')
 
-    posts = Post.objects.all().order_by('-created_at')
+    if category_slug:
+        posts = Post.objects.filter(category__slug=category_slug).order_by('-created_at')
+    else:
+        posts = Post.objects.all().order_by('-created_at')
 
-    current_category = None
-    if slug:
-        current_category = get_object_or_404(Category, slug=slug)
-        posts = posts.filter(category=current_category)
+    if sort == 'popular':
+        posts = posts.order_by('-likes')
+    else:
+        posts = posts.order_by('-created_at')
 
-    context = {
-        "categories" : categories, 
-        "posts" : posts, 
-        "current_category" : current_category, 
-    }
-    return render(request, 'Qampus/main.html', {'posts':posts, 'context':context})
-
-def create(request):
+    return render(request, 'Qampus/main.html', {'posts': posts, 'selected_slug': category_slug, 'sort':sort})
+    
+def create(request, slug=None):
     if request.method == 'POST':
         title = request.POST.get('title')
         content = request.POST.get('content')
+        category_id = request.POST.get('category')
 
-        posts = Post.objects.create(
+        Post.objects.create(
             title = title,
             content = content,
-            author = request.user,
-            category = category,
+            category_id = category_id,
         )
         return redirect('Qampus:main')
     categories = Category.objects.all()
@@ -38,6 +37,7 @@ def detail(request, id):
     post = get_object_or_404(Post, id=id)
     comments = post.comments.all().order_by('-created_at')
     comment_count = post.comments.count()
+    like_count = post.likes.count()
     reply_count = Reply.objects.filter(comment__post=post).count()
     total_comment_count = comment_count + reply_count
 
@@ -48,7 +48,8 @@ def detail(request, id):
                 'comments': comments,
                 'like_count': post.like_count,
                 'scrap_count': post.scrap_count,
-                'comment_count': total_comment_count,})
+                'comment_count': total_comment_count,
+                'content':content})
 
 def update(request, id):
     post = get_object_or_404(Post, id=id)
@@ -58,7 +59,8 @@ def update(request, id):
         post.content = request.POST.get('content')
         post.save()
         return redirect('Qampus:detail', id)
-    return render(request, 'Qampus/update.html', {'post':post})
+    categories = Category.objects.all()
+    return render(request, 'Qampus/update.html', {'post':post, 'categories':categories})
 
 def delete(request, id):
     post = get_object_or_404(Post, id=id)
