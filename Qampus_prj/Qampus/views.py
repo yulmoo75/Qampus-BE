@@ -19,35 +19,41 @@ def main(request):
     return render(request, 'Qampus/main.html', {'posts': posts, 'selected_slug': category_slug, 'sort':sort})
     
 def create(request, slug=None):
+    categories = Category.objects.all()
+
     if request.method == 'POST':
         title = request.POST.get('title')
         content = request.POST.get('content')
-        category_id = request.POST.get('category')
+        category_ids = request.POST.getlist('category')
+        category_list = [get_object_or_404(Category, id=category_id) for category_id in category_ids]
 
-        Post.objects.create(
+        post = Post.objects.create(
             title = title,
             content = content,
-            category_id = category_id,
         )
+
+        for category in category_list:
+            post.category.add(category)
         return redirect('Qampus:main')
-    categories = Category.objects.all()
     return render(request, 'Qampus/create.html', {'categories' : categories})
 
 def detail(request, id):
     post = get_object_or_404(Post, id=id)
     comments = post.comments.all().order_by('-created_at')
     comment_count = post.comments.count()
-    like_count = post.likes.count()
+    like_count = post.like_count
+    scrap_count = post.scrap_count
     reply_count = Reply.objects.filter(comment__post=post).count()
     total_comment_count = comment_count + reply_count
 
+    content = ''
     if request.method == 'POST':
         content = request.POST.get('content')
     return render(request, 'Qampus/detail.html', 
                 {'post':post,
                 'comments': comments,
-                'like_count': post.like_count,
-                'scrap_count': post.scrap_count,
+                'like_count': like_count,
+                'scrap_count': scrap_count,
                 'comment_count': total_comment_count,
                 'content':content})
 
@@ -58,6 +64,15 @@ def update(request, id):
         post.title = request.POST.get('title')
         post.content = request.POST.get('content')
         post.save()
+        
+        category_ids = request.POST.getlist('category')
+
+        if category_ids:
+            updated_categories = Category.objects.filter(id__in=category_ids)
+            post.category.set(updated_categories)
+        else:
+            post.category.clear()
+            
         return redirect('Qampus:detail', id)
     categories = Category.objects.all()
     return render(request, 'Qampus/update.html', {'post':post, 'categories':categories})

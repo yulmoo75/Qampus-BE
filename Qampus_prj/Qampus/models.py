@@ -6,20 +6,24 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-
     
 class Post(models.Model):
     title = models.CharField(max_length= 50)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add= True)
-    category = models.ManyToManyField(Category, blank=True)
+    category = models.ManyToManyField(Category, related_name="posts")    
     like_count = models.PositiveIntegerField(default=0)
+    scrap_count = models.PositiveIntegerField(default=0)
     likes = models.PositiveBigIntegerField(default=0)
     scraps = models.PositiveBigIntegerField(default=0)
 
     def __str__(self):
         return f'[{self.id}] self.title'
     
+class PostCategory(models.Model):
+    post = models.ForeignKey(to=Post, on_delete=models.CASCADE, related_name="post_categories")
+    category = models.ForeignKey(to=Category, on_delete=models.CASCADE, related_name="post_categories")
+
     
 class Comment(models.Model):
     post = models.ForeignKey(to=Post, on_delete=models.CASCADE, related_name="comments")

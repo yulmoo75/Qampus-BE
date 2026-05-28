@@ -12,14 +12,14 @@
         제목 - <input type="text" value="{{ post.title }}" name="title"><br><br>
         내용 - <textarea name="content">{{ post.content }}</textarea><br><br>
         
-    <select name="category">
-            {% for category in categories %}
-                <option value="{{ category.id }}" {% if category == post.category %}selected{% endif %}>
-                    {{ category.name }}
-                </option>
-            {% endfor %}
-        </select>
-        <br><br>
-        <input type="submit" value="수정하기">
+    <select name="category" multiple>
+        {% for category in categories %}
+            <option value="{{ category.id }}" {% if category == post.category %}selected{% endif %}>
+                {{ category.name }}
+            </option>
+        {% endfor %}
+    </select>
+    <br><br>
+    <input type="submit" value="수정하기">
 </body>
 </html>
