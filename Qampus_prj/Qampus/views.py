@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import *
 from django.shortcuts import get_object_or_404
+from django.contrib import messages
 
 def main(request):
     category_slug = request.POST.get('category_slug', '')
@@ -22,9 +23,15 @@ def create(request, slug=None):
     categories = Category.objects.all()
 
     if request.method == 'POST':
-        title = request.POST.get('title')
-        content = request.POST.get('content')
+        title = request.POST.get('title').strip()
+        content = request.POST.get('content').strip()
         category_ids = request.POST.getlist('category')
+
+        if not title or not content or not category_ids:
+            messages.error(request, "제목, 내용, 카테고리를 필수로 입력해주세요. ")
+            categories = Category.objects.all()
+            return render(request, 'Qampus/create.html', {'categories': categories})
+        
         category_list = [get_object_or_404(Category, id=category_id) for category_id in category_ids]
 
         post = Post.objects.create(

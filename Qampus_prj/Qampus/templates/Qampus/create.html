@@ -10,11 +10,10 @@
     <form method="POST" action="{% url 'Qampus:create' %}">
         {% csrf_token %}
         <input type="submit" value="완료">
-        제목을 입력해주세요.<input type="text" name="title" /><br><br><hr>
-        궁금한 내용을 자세히 적어주세요. 구체적일수록 더 좋은 답변을 받을 수 있어요.<textarea name="content"></textarea><br><br>
+        제목을 입력해주세요.<input type="text" name="title" required /><br><br><hr>
+        궁금한 내용을 자세히 적어주세요. 구체적일수록 더 좋은 답변을 받을 수 있어요.<textarea name="content" required></textarea><br><br>
         
-        #카테고리 중복이 안된다.........
-        <select name="category" multiple>
+        <select name="category" multiple required>
         {% for category in categories %}
         <option value="{{ category.id }}">{{ category.name }}</option>
         {% endfor %}
