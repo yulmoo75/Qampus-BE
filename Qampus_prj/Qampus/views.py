@@ -12,7 +12,7 @@ def main(request):
         posts = Post.objects.all().order_by('-created_at')
 
     if sort == 'popular':
-        posts = posts.order_by('-likes')
+        posts = posts.order_by('-like_count')
     else:
         posts = posts.order_by('-created_at')
 
@@ -43,8 +43,8 @@ def detail(request, id):
     comment_count = post.comments.count()
     reply_count = Reply.objects.filter(comment__post=post).count()
     total_comment_count = comment_count + reply_count
-    like_count = post.likes.count()
-    scrap_count = post.scrap.count()
+    like_count = post.like_count
+    scrap_count = post.scrap_count
 
     content = ''
     if request.method == 'POST':
@@ -185,6 +185,26 @@ def scrap_post(request, post_id):
 
     return redirect('Qampus:detail', post.id)
 
+#게시글 좋아요
+def like_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    liked_posts = request.session.get('liked_posts', [])
+
+    if post_id in liked_posts:
+        if post.like_count > 0:
+            post.like_count -= 1
+        liked_posts.remove(post_id)
+    else:
+        post.like_count += 1
+        liked_posts.append(post_id)
+
+    post.save()
+    request.session['liked_posts'] = liked_posts
+
+    return redirect('Qampus:detail', post.id)
+
+
 #댓글/대댓글 좋아요
 def like_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
@@ -220,5 +240,4 @@ def like_reply(request, reply_id):
 
     reply.save()
     request.session['liked_replies'] = liked_replies
-
     return redirect('Qampus:detail', reply.comment.post.id)

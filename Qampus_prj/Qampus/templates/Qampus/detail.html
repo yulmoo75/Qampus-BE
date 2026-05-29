@@ -16,10 +16,6 @@
         <a href="#">삭제하기</a>
     </dialog>
 
-    <p>좋아요 {{ post.like_count }}</p>
-    <p>댓글 {{ comment_count }}</p>
-    <p>스크랩 {{ post.scrap_count }}</p>
-
 
     <h3>질문자 </h3>
     <p>{{ post.created_at }}</p>
@@ -33,16 +29,22 @@
         {% endfor %}
     </p>
     
-    <p>좋아요 {{ post.post_like.count }}개</p>
-    <p>답변 {{ post.answer.count }}개</p>
-    <p>스크랩 {{ post.scrap.count }}개</p><hr>
 
-    <p>답변 {{ post.answer.count }}</p>
+    <p>좋아요 {{ like_count }}개</p>
+    <form method="POST" action="{% url 'Qampus:like_post' post.id %}">
+    {% csrf_token %}
+    <button type="submit">좋아요</button>
+    </form>
 
+    <p>답변 {{ post.comment.count }}개</p>
+    <p>스크랩 {{ scrap_count }}개</p>
     <form method="POST" action="{% url 'Qampus:scrap_post' post.id %}">
     {% csrf_token %}
     <button type="submit">스크랩</button>
     </form>
+
+
+    <!--댓글-->
 
     <hr>
     {% for comment in comments %}
