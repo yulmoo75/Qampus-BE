@@ -11,10 +11,9 @@
     <button onclick="document.getElementById('menu').showModal()">⋮</button>
 
     <dialog id="menu">
-        <form action="{% url 'Qampus:update' post.id %}" method="POST">
-            {% csrf_token %}
-            <button type="submit">수정하기</button>
-        </form>
+        <a href="{% url 'Qampus:update' post.id %}">
+            <button type="button">수정하기</button>
+        </a>
         <br>
         <form action="{% url 'Qampus:delete' post.id %}" method="POST">
             {% csrf_token %}

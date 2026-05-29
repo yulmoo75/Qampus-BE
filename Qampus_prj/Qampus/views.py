@@ -62,9 +62,9 @@ def update(request, id):
     post = get_object_or_404(Post, id=id)
 
     if request.method == 'POST':
+        print("=== POST 요청 들어옴 ===")
         post.title = request.POST.get('title')
         post.content = request.POST.get('content')
-        post.save()
         
         category_ids = request.POST.getlist('category')
 
@@ -74,7 +74,8 @@ def update(request, id):
         else:
             post.category.clear()
             
-        return redirect('Qampus:detail', id)
+        post.save()
+        return redirect('Qampus:detail', id=post.id)
     categories = Category.objects.all()
     return render(request, 'Qampus/update.html', {'post':post, 'categories':categories})
 
