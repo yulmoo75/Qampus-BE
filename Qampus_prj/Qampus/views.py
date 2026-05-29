@@ -41,10 +41,10 @@ def detail(request, id):
     post = get_object_or_404(Post, id=id)
     comments = post.comments.all().order_by('-created_at')
     comment_count = post.comments.count()
-    like_count = post.like_count
-    scrap_count = post.scrap_count
     reply_count = Reply.objects.filter(comment__post=post).count()
     total_comment_count = comment_count + reply_count
+    like_count = post.like_count
+    scrap_count = post.scrap_count
 
     content = ''
     if request.method == 'POST':
@@ -55,7 +55,7 @@ def detail(request, id):
                 'like_count': like_count,
                 'scrap_count': scrap_count,
                 'comment_count': total_comment_count,
-                'content':content})
+                })
 
 def update(request, id):
     post = get_object_or_404(Post, id=id)
@@ -164,3 +164,81 @@ def delete_reply(request, reply_id):
     reply.delete()
 
     return redirect("Qampus:detail", post_id)
+
+
+#게시글 스크랩
+def scrap_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    scrapped_posts = request.session.get('scrapped_posts', [])
+
+    if post_id in scrapped_posts:
+        if post.scrap_count > 0:
+            post.scrap_count -= 1
+        scrapped_posts.remove(post_id)
+    else:
+        post.scrap_count += 1
+        scrapped_posts.append(post_id)
+
+    post.save()
+    request.session['scrapped_posts'] = scrapped_posts
+
+    return redirect('Qampus:detail', post.id)
+
+#게시글 좋아요
+def like_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    liked_posts = request.session.get('liked_posts', [])
+
+    if post_id in liked_posts:
+        if post.like_count > 0:
+            post.like_count -= 1
+        liked_posts.remove(post_id)
+    else:
+        post.like_count += 1
+        liked_posts.append(post_id)
+
+    post.save()
+    request.session['liked_posts'] = liked_posts
+
+    return redirect('Qampus:detail', post.id)
+
+
+#댓글/대댓글 좋아요
+def like_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+
+    liked_comments = request.session.get('liked_comments', [])
+
+    if comment_id in liked_comments:
+        if comment.like_count > 0:
+            comment.like_count -= 1
+        liked_comments.remove(comment_id)
+    else:
+        comment.like_count += 1
+        liked_comments.append(comment_id)
+
+    comment.save()
+    request.session['liked_comments'] = liked_comments
+
+    return redirect('Qampus:detail', comment.post.id)
+
+
+def like_reply(request, reply_id):
+    reply = get_object_or_404(Reply, id=reply_id)
+
+    liked_replies = request.session.get('liked_replies', [])
+
+    if reply_id in liked_replies:
+        if reply.like_count > 0:
+            reply.like_count -= 1
+        liked_replies.remove(reply_id)
+    else:
+        reply.like_count += 1
+        liked_replies.append(reply_id)
+
+    reply.save()
+    request.session['liked_replies'] = liked_replies
+    return redirect('Qampus:detail', reply.comment.post.id)
+

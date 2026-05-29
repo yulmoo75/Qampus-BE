@@ -14,8 +14,6 @@ class Post(models.Model):
     category = models.ManyToManyField(Category, related_name="posts")    
     like_count = models.PositiveIntegerField(default=0)
     scrap_count = models.PositiveIntegerField(default=0)
-    likes = models.PositiveBigIntegerField(default=0)
-    scraps = models.PositiveBigIntegerField(default=0)
 
     def __str__(self):
         return f'[{self.id}] self.title'

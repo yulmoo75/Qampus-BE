@@ -6,7 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-    <a href="{% url 'Qampus:main' %}">< 질의 응답</a>
+    <a href="{% url 'Qampus:main' %}">질의 응답</a>
 
     <button onclick="document.getElementById('menu').showModal()">⋮</button>
 
@@ -15,6 +15,7 @@
         <br>
         <a href="#">삭제하기</a>
     </dialog>
+
 
     <h3>질문자 </h3>
     <p>{{ post.created_at }}</p>
@@ -33,10 +34,33 @@
     <p>스크랩 {{ post.scrap.count }}개</p>
 
     <p>답변 {{ post.post_answer.count }}</p>
+    <p>좋아요 {{ like_count }}개</p>
+    <form method="POST" action="{% url 'Qampus:like_post' post.id %}">
+    {% csrf_token %}
+    <button type="submit">좋아요</button>
+    </form>
 
+    <p>답변 {{ post.comment.count }}개</p>
+    <p>스크랩 {{ scrap_count }}개</p>
+    <form method="POST" action="{% url 'Qampus:scrap_post' post.id %}">
+    {% csrf_token %}
+    <button type="submit">스크랩</button>
+    </form>
+
+
+    <!--댓글-->
+
+    <hr>
     {% for comment in comments %}
     <div>
         <p>응답자 : {{ comment.content }}</p>
+        <p>익명 : {{ comment.content }}</p>
+        <p>좋아요 {{ comment.like_count }} / {{ comment.created_at }}</p>
+
+        <form method="POST" action="{% url 'Qampus:like_comment' comment.id %}">
+            {% csrf_token %}
+            <button type="submit">좋아요</button>
+        </form>
 
         <!-- 댓글 수정 -->
         <form method="POST" action="{% url 'Qampus:update_comment' comment.id %}">
@@ -55,6 +79,12 @@
         {% for reply in comment.replies.all %}
             <div style="margin-left: 30px;">
                 <p>익명 : {{ reply.content }}</p>
+                <p>좋아요 {{ reply.like_count }} / {{ reply.created_at }}</p>
+
+                <form method="POST" action="{% url 'Qampus:like_reply' reply.id %}">
+                    {% csrf_token %}
+                    <button type="submit">좋아요</button>
+                </form>
 
                 <!-- 대댓글 수정 -->
                 <form method="POST" action="{% url 'Qampus:update_reply' reply.id %}">
