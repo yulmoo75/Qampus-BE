@@ -15,7 +15,7 @@
     <select name="category">
         {% for category in categories %}
             <option value="{{ category.id }}" {% if category in post.category.all %}selected{% endif %}>
-                {{ category.name }}
+                {{ category.name }} 
             </option>
         {% endfor %}
     </select>
