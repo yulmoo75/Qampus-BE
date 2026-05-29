@@ -16,4 +16,8 @@ urlpatterns = [
     path("comments/<int:comment_id>/replies/create/", create_reply, name="create_reply"),
     path("replies/<int:reply_id>/update/", update_reply, name="update_reply"),
     path("replies/<int:reply_id>/delete/", delete_reply, name="delete_reply"),
+    path('api/posts/', api_post_list, name='api_post_list'), 
+    path('api/posts/<int:id>/', api_post_detail, name='api_post_detail'),
+    path('api/posts/create/', api_post_create, name='api_post_create'),
+    path('api/posts/<int:id>/update/', api_post_update, name='api_post_update'),
 ]

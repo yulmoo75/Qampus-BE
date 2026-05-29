@@ -2,6 +2,10 @@ from django.shortcuts import render, redirect
 from .models import *
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import PostListSerializer
 
 def main(request):
     category_slug = request.POST.get('category_slug', '')
@@ -171,3 +175,48 @@ def delete_reply(request, reply_id):
     reply.delete()
 
     return redirect("Qampus:detail", post_id)
+
+@api_view(['GET'])
+def api_post_list(request):
+    posts = Post.objects.all().order_by('-created_at')
+    
+    category_slug = request.GET.get('category_slug', '')
+    if category_slug:
+        posts = posts.filter(category__slug=category_slug)
+        
+    if not posts.exists():
+        return Response([], status=status.HTTP_200_OK)
+
+    serializer = PostListSerializer(posts, many=True)
+    
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def api_post_detail(request, id):
+    post = get_object_or_404(Post, id=id)
+    serializer = PostDetailSerializer(post)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def api_post_create(request):
+    serializer = PostCreateUpdateSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        if serializer.is_valid():
+            post = serializer.save()
+            return Response({"message": "질문이 등록되었습니다.", "id": post.id}, status=status.HTTP_201_CREATED)
+            
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+def api_post_update(request, id):
+    post = get_object_or_404(Post, id=id)
+    
+    serializer = PostCreateUpdateSerializer(instance=post, data=request.data)
+    
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"message": "질문이 수정되었습니다."}, status=status.HTTP_200_OK)
+        
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
