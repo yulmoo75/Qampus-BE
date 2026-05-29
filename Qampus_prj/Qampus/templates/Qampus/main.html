@@ -8,6 +8,11 @@
 <body>
     {% load humanize %}
     <h2>질의응답</h2><hr>
+    <button onclick="document.getElementById('menu').showModal()">⋮</button>
+    <dialog id="menu">
+        <a href="{% url 'Qampus:create' %}">질문 올리기</a> 
+    </dialog>
+
     <form action="{% url 'Qampus:main' %}" method="POST">
         {% csrf_token %}
         
@@ -17,22 +22,36 @@
         <button type="submit" name="category_slug" value="program" class="link-btn">학교 프로그램</button>
         <button type="submit" name="category_slug" value="procedure" class="link-btn">행정/절차</button>
         
-    </form><hr>
+    </form><hr> 
 
-    <select name="sort" onchange="this.form.submit()">
-        <option value="latest" {% if selected_sort == 'latest' %}selected{% endif %}>최신순</option>
-        <option value="popular" {% if selected_sort == 'popular' %}selected{% endif %}>추천순</option>
-    </select>
+    <form method="GET" action="{% url 'Qampus:main' %}">
+    <input type="hidden" name="category_slug" value="{{ selected_slug }}">
+        <select name="sort" onchange="this.form.submit()">
+            <option value="latest" {% if selected_sort == 'latest' %}selected{% endif %}>최신순</option>
+            <option value="popular" {% if selected_sort == 'popular' %}selected{% endif %}>추천순</option>
+        </select>
 
     <input type="hidden" name="category_slug" value="{{ selected_slug }}">
     
     {% for post in posts %}
         <p><a href="{% url 'Qampus:detail' post.id %}">{{ post.title }}</a></p>
         <p>{{ post.content }}</p>
-        <p>{{ post.created_at|naturaltime }}</p><hr>
+        <p>{{ post.created_at|naturaltime }}</p>
+
+        <p>{{ post.post_like.count }}</p>
+        <p>{{ post.post_answer.count }}</p>
+        <hr>
     {% empty %}
         <p>아직 작성된 질문이 없어요</p>
-        #수업 카테고리에서는 수업, 학교 프로그램은 학교 프로그램으로 나오는건지? 그러면 전체는??
+        {% if selected_slug == 'class' %}
+            <p>수업에 대해 궁금한 건 무엇이든 질문하세요!</p>
+        {% elif selected_slug == 'program' %}
+            <p>학교 프로그램에 대해 궁금한 건 무엇이든 질문하세요!</p>
+        {% elif selected_slug == 'procedure' %}
+            <p>행정/절차에 대해 궁금한 건 무엇이든 질문하세요!</p>
+        {% else %}
+            <p>학교 생활 중 궁금한 건 무엇이든 질문하세요!</p>
+        {% endif %}
         <p>수업에 대해 궁금한 건 무엇이든 질문하세요!</p>
     {% endfor %}
 

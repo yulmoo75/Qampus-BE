@@ -4,19 +4,20 @@ from django.shortcuts import get_object_or_404
 
 def main(request):
     category_slug = request.POST.get('category_slug', '')
-    sort = request.POST.get('sort', 'latest')
+    selected_sort = request.GET.get('sort', 'latest')
+    posts = Post.objects.all()
 
     if category_slug:
         posts = Post.objects.filter(category__slug=category_slug).order_by('-created_at')
     else:
         posts = Post.objects.all().order_by('-created_at')
 
-    if sort == 'popular':
-        posts = posts.order_by('-like_count')
+    if selected_sort == 'popular':
+        posts = posts.order_by('-like_count', '-created_at')
     else:
         posts = posts.order_by('-created_at')
 
-    return render(request, 'Qampus/main.html', {'posts': posts, 'selected_slug': category_slug, 'sort':sort})
+    return render(request, 'Qampus/main.html', {'posts': posts, 'selected_slug': category_slug, 'selected_sort':selected_sort})
     
 def create(request, slug=None):
     categories = Category.objects.all()
