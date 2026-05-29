@@ -11,9 +11,15 @@
     <button onclick="document.getElementById('menu').showModal()">⋮</button>
 
     <dialog id="menu">
-        <a href="{% url 'Qampus:update' post.id %}">수정하기</a>
+        <form action="{% url 'Qampus:update' post.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit">수정하기</button>
+        </form>
         <br>
-        <a href="#">삭제하기</a>
+        <form action="{% url 'Qampus:delete' post.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit">삭제하기</button>
+        </form>
     </dialog>
 
 
@@ -30,15 +36,14 @@
     </p>
     
 
-    <p>답변 {{ post.post_answer.count }}</p>
-    <p>좋아요 {{ like_count }}개</p>
+    <a>답변 {{ comment_count }}개</a>
+    <a>좋아요 {{ like_count }}개</a>
     <form method="POST" action="{% url 'Qampus:like_post' post.id %}">
     {% csrf_token %}
     <button type="submit">좋아요</button>
     </form>
-
-    <p>답변 {{ post.comment.count }}개</p>
-    <p>스크랩 {{ scrap_count }}개</p>
+    <br>
+    <a>스크랩 {{ scrap_count }}개</a>
     <form method="POST" action="{% url 'Qampus:scrap_post' post.id %}">
     {% csrf_token %}
     <button type="submit">스크랩</button>
@@ -46,11 +51,15 @@
 
 
     <!--댓글-->
-
+    <form method="POST" action="{% url 'Qampus:create_comment' post.id %}">
+        {% csrf_token %}
+        <input type="text" name="content" placeholder="답변을 입력해세요" required>
+        <button type="submit">등록</button>
+    </form>
+    <br>
     <hr>
     {% for comment in comments %}
     <div>
-        <p>응답자 : {{ comment.content }}</p>
         <p>익명 : {{ comment.content }}</p>
         <p>좋아요 {{ comment.like_count }} / {{ comment.created_at }}</p>
 

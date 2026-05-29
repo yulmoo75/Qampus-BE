@@ -16,11 +16,8 @@ class Post(models.Model):
     scrap_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f'[{self.id}] self.title'
+        return f'[{self.id}] {self.title}'
     
-class PostCategory(models.Model):
-    post = models.ForeignKey(to=Post, on_delete=models.CASCADE, related_name="post_categories")
-    category = models.ForeignKey(to=Category, on_delete=models.CASCADE, related_name="post_categories")
 
     
 class Comment(models.Model):
