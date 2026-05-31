@@ -30,7 +30,14 @@ jobs:
             # 2) 장고 앱 폴더에서 migrate
             cd ${{ secrets.APP_DIR }}
             rm -rf myvenv
-            python3 -m venv myvenv
+            if command -v python3.11 &> /dev/null; then
+              python3.11 -m venv myvenv
+            elif command -v python3.12 &> /dev/null; then
+              python3.12 -m venv myvenv
+            else
+              python3 -m venv myvenv
+            fi
+            
             myvenv/bin/python -m pip install --upgrade pip setuptools wheel
             if [ -f requirements.txt ]; then myvenv/bin/pip install -r requirements.txt; fi
             myvenv/bin/python manage.py migrate --noinput
